@@ -30,29 +30,6 @@ The analysis uses labeled CCTP bridge transaction data (`cctp_bridge_data_labele
 
 **Note**: The dataset file is large (>50MB) and demonstrates real-world compliance detection challenges.
 
-## 🛠️ Features
-
-### Machine Learning Models
-- **Random Forest Classifier** - Ensemble method with feature importance
-- **Gradient Boosting Classifier** - Sequential weak learner optimization
-- **XGBoost** - Advanced gradient boosting with regularization
-- **Logistic Regression** - Linear probabilistic classification
-- **Support Vector Machine (SVM)** - High-dimensional pattern recognition
-
-### Advanced Capabilities
-- **Threshold Optimization** - Maximizes recall while maintaining precision
-- **Hyperparameter Tuning** - Grid search with cross-validation
-- **Feature Selection** - Statistical feature importance ranking
-- **Cross-Validation** - 5-fold CV for robust model evaluation
-- **Comprehensive Metrics** - AUC, Precision, Recall, F1-Score
-
-### Visualization Suite
-- Model performance comparison charts
-- ROC and Precision-Recall curves
-- Feature importance analysis
-- Threshold optimization plots
-- Confusion matrices and classification reports
-
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -197,41 +174,6 @@ The results demonstrate the challenge of detecting rare anomalies in financial d
 - **Traditional models** (Logistic Regression, SVM) struggled with the extreme class imbalance
 - **Threshold optimization** was crucial for improving recall in compliance scenarios
 
-### Real-World Implications
-
-#### Compliance Perspective
-- **Detection Rate**: Random Forest detected 35.4% of suspicious transactions
-- **False Positive Rate**: 50% precision means manageable false alarm rate
-- **Operational Impact**: 17 true detections out of 48 suspicious cases
-- **Risk Mitigation**: Significant improvement over random detection (0.04% baseline)
-
-#### Technical Challenges Addressed
-1. **Extreme Class Imbalance**: Successfully handled 0.04% positive class
-2. **Feature Engineering**: Temporal and address patterns proved most informative  
-3. **Threshold Optimization**: Critical for balancing recall vs precision
-4. **Cross-Validation**: Robust evaluation despite small positive class
-5. **Scalability**: Processed 591K+ transactions efficiently
-
-#### Production Considerations
-- **Real-time Deployment**: Models suitable for streaming transaction analysis
-- **Alert Management**: Precision levels support manageable investigation workload
-- **Continuous Learning**: Framework supports model updates with new labeled data
-- **Regulatory Compliance**: Explainable features support audit requirements
-
-## 🔍 Key Features
-
-### Compliance-Focused Design
-- **Recall Optimization** - Minimizes missed suspicious transactions
-- **Explainable AI** - Feature importance for regulatory reporting
-- **Threshold Tuning** - Configurable sensitivity levels
-- **Audit Trail** - Comprehensive logging and reporting
-
-### Technical Highlights
-- **Scalable Architecture** - Modular design for easy extension
-- **Performance Monitoring** - Cross-validation and statistical testing
-- **Visualization Suite** - Comprehensive performance analysis
-- **Production Ready** - Error handling and robust preprocessing
-
 ## 📋 Dependencies
 
 ### Core Libraries
@@ -239,14 +181,6 @@ The results demonstrate the challenge of detecting rare anomalies in financial d
 - **numpy** - Numerical computing
 - **scikit-learn** - Machine learning algorithms
 - **xgboost** - Gradient boosting framework
-
-### Visualization
-- **matplotlib** - Static plotting
-- **seaborn** - Statistical visualization
-
-### Development
-- **jupyter** - Interactive development environment
-- **notebook** - Jupyter notebook interface
 
 ## 🤝 Contributing
 
@@ -259,24 +193,6 @@ The results demonstrate the challenge of detecting rare anomalies in financial d
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👤 Author
-
-**Babu Pillai**
-- Institution: Griffith University
-- GitHub: [@b-pillai](https://github.com/b-pillai)
-
-## 🙏 Acknowledgments
-
-- Griffith University for research support
-- Circle's CCTP for cross-chain infrastructure
-- Open-source ML community for tools and libraries
-
-## 📞 Support
-
-For questions, issues, or collaboration opportunities:
-- Open an issue on GitHub
-- Contact the author through institutional channels
 
 ---
 
