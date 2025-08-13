@@ -1,0 +1,351 @@
+\section{Results and Discussion}
+
+The primary objective is to develop an anomaly detection framework tailored for cross-chain bridge transaction analysis, with a specific focus on flagging suspicious transactions. The goal is to identify as many abnormal (suspicious) transactions as possible (maximizing recall), while keeping the number of normal transactions incorrectly flagged as abnormal to a minimum (minimizing false positives). This balance is critical in real-world applications of cross-chain bridges, where missing a suspicious transaction can have serious consequences, yet overwhelming analysts with false alarms can hinder operational efficiency.
+
+To evaluate the robustness and generalizability of our approach, we conducted experiments on two distinct cross-chain bridge datasets: Circle's Cross-Chain Transfer Protocol (CCTP) and Across Protocol. These datasets represent different bridge architectures, transaction volumes, and feature compositions, providing a comprehensive assessment of the proposed methodology across diverse cross-chain environments.
+
+\subsection{Experimental Setup and Dataset Characteristics}
+
+\subsubsection{CCTP Bridge Dataset}
+The CCTP dataset comprises 591,940 transactions with 12 features, exhibiting extreme class imbalance with only 241 Tornado Cash-associated transactions (0.04\% positive class). After preprocessing and feature engineering, 7 key features were selected: source blockchain, source address, timestamps, destination blockchain, transaction amounts, and USD valuations. The dataset was split into 473,552 training samples (193 positive cases) and 118,388 test samples (48 positive cases), maintaining the original class distribution.
+
+\subsubsection{Across Protocol Dataset}
+The Across Protocol dataset contains 1,123,166 transactions with 20 features, representing a larger and more complex cross-chain environment. Despite the larger absolute number of suspicious transactions (396), the dataset maintains a similar class imbalance ratio (0.04\% positive class). Feature engineering resulted in 15 predictive variables, including additional bridge-specific features such as fill deadlines, exclusivity parameters, and relayer information. The training set comprised 898,532 samples (317 positive cases) and the test set included 224,634 samples (79 positive cases).
+
+\subsection{Comparative Model Performance Analysis}
+
+Table~\ref{tab:comparative_performance} presents a comprehensive comparison of model performance across both bridge datasets. The results demonstrate both the consistency and dataset-specific variations in anomaly detection effectiveness across different cross-chain environments.
+
+\begin{table}[h]
+\centering
+\caption{Comparative Performance Analysis: CCTP vs. Across Protocol}
+\label{tab:comparative_performance}
+\begin{tabular}{lcccccccc}
+\toprule
+& \multicolumn{4}{c}{\textbf{CCTP Bridge}} & \multicolumn{4}{c}{\textbf{Across Protocol}} \\
+\cmidrule(lr){2-5} \cmidrule(lr){6-9}
+\textbf{Algorithm} & \textbf{AUC} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{AUC} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} \\
+\midrule
+Random Forest & 0.8293 & \textbf{0.5000} & \textbf{0.3542} & \textbf{0.4146} & 0.8439 & \textbf{0.4576} & \textbf{0.3418} & \textbf{0.3913} \\
+XGBoost & \textbf{0.8756} & 0.3824 & 0.2708 & 0.3171 & \textbf{0.9296} & 0.2568 & 0.2405 & 0.2484 \\
+Gradient Boosting & 0.8161 & 0.1915 & 0.1875 & 0.1895 & 0.7713 & 0.2000 & 0.0506 & 0.0808 \\
+Logistic Regression & 0.7014 & 0.0000 & 0.0000 & 0.0000 & 0.6751 & 0.0000 & 0.0000 & 0.0000 \\
+Support Vector Machine & 0.4145 & 0.0000 & 0.0000 & 0.0000 & 0.4225 & 0.0000 & 0.0000 & 0.0000 \\
+\bottomrule
+\end{tabular}
+
+\begin{minipage}{\textwidth}
+\par\vspace{0.5em}
+\footnotesize
+\textit{Note:} Bold values indicate best performance within each dataset. Threshold optimization (0.100) was applied for Random Forest and XGBoost; default threshold (0.500) for other models.
+\end{minipage}
+\end{table}
+
+\subsubsection{Cross-Dataset Performance Insights}
+
+The comparative analysis reveals several important findings:
+
+\textbf{Model Consistency:} Random Forest demonstrated the most consistent performance across both datasets, maintaining strong recall rates (35.42\% vs. 34.18\%) and reasonable precision (50.00\% vs. 45.76\%). This consistency suggests that Random Forest's ensemble approach is robust to variations in feature spaces and dataset characteristics.
+
+\textbf{XGBoost Variability:} While XGBoost achieved the highest AUC scores on both datasets (0.8756 vs. 0.9296), its recall performance showed greater variation (27.08\% vs. 24.05\%). The superior AUC on the Across dataset (0.9296) indicates better overall discriminative capability, yet this did not translate to improved detection rates at the optimized threshold.
+
+\textbf{Dataset Complexity Impact:} The Across Protocol's richer feature space (15 vs. 7 features) and larger transaction volume (1.12M vs. 591K) provided additional context for model training. However, this complexity did not uniformly improve performance, suggesting that feature quality rather than quantity is crucial for effective anomaly detection.
+
+\textbf{Traditional Model Limitations:} Both Logistic Regression and Support Vector Machine consistently failed across datasets, reinforcing their inadequacy for extreme class imbalance scenarios in cross-chain anomaly detection.
+
+\subsection{Individual Dataset Performance Analysis}
+
+Although all models report an accuracy of 1.00, this metric is not informative in the context of imbalanced datasets (approximately 2,455:1 for CCTP and 2,836:1 for Across). It is a known issue that accuracy can be misleading in imbalanced datasets, as models tend to favor the majority class and fail to detect minority class instances, resulting in deceptively high accuracy scores \cite{he2009learning, haixiang2017learning}. As such, other metrics like precision, recall, F1 score and AUC were examined for more meaningful evaluation of model effectiveness.
+
+\subsubsection{CCTP Bridge Detailed Results}
+
+Delving into the CCTP results, XGBoost outperformed all other models with an AUC score of 0.8756 and demonstrated excellent cross-validation stability (CV AUC: 0.8936 ± 0.0530). However, Random Forest achieved a notably higher recall of 35.42\% while maintaining a precision of 50.0\%, making it particularly effective in detecting rare positive cases. Gradient Boosting showed moderate but unstable performance, whereas Logistic Regression and Support Vector Machine failed entirely to identify any suspicious transactions.
+
+\subsubsection{Across Protocol Detailed Results}
+
+The Across Protocol results show XGBoost achieving an even higher AUC of 0.9296 with strong cross-validation performance (CV AUC: 0.9131 ± 0.0451), demonstrating superior discriminative capability on the larger, more complex dataset. Random Forest maintained consistent performance with 34.18\% recall and 45.76\% precision. Notably, Gradient Boosting showed significantly degraded recall performance (5.06\%) on the Across dataset, suggesting sensitivity to the increased feature complexity.
+
+The AUC is a widely used metric that evaluates a classifier's ability to distinguish between classes by plotting the True Positive Rate (TPR) against the False Positive Rate (FPR) across varying thresholds. While a high AUC indicates strong overall ranking performance, it does not reflect how the model performs at a specific decision threshold, especially in imbalanced datasets. In practice, models are deployed at fixed thresholds, where metrics such as recall, precision, and the confusion matrix provide a more realistic view of classification effectiveness. Therefore, relying solely on AUC can be misleading, and a thorough performance evaluation must include threshold-dependent metrics to assess real-world applicability.
+
+
+\subsection{Model Performance and Comparison}
+
+Table~\ref{tab:model_performance} presents the comprehensive performance evaluation of five supervised learning algorithms applied to the CCTP bridge transaction dataset we prepared. XGBoost emerged as the superior classifier in terms of discriminative capability, achieving the highest Area Under Curve (AUC) score whereas, Random Forest demonstrated the best balance between precision and recall for practical deployment.
+
+Although all models report an accuracy of 1.00, this metric is not informative in the context of an imbalanced dataset (approximately 2455:1 in this case).
+%The extremely high accuracy values stem from the models predominantly predicting the majority class which dominates the dataset while largely failing to capture instances of the minority class (i.e., Tornado Cash related addresses), highlighting the inadequacy of accuracy in imbalanced classification tasks~\cite{he2009learning, haixiang2017learning}.
+It is a known issue that accuracy can be misleading in imbalanced datasets, as models tend to favor the majority class and fail to detect minority class instances, resulting in deceptively high accuracy scores \cite{he2009learning, haixiang2017learning}.
+As such, other metrics like precision, recall, F1 score and AUC where examined for more meaningful evaluation of model effectiveness. 
+%For instance, while XGBoost achieves the highest AUC (0.8756) and cross-validated AUC (0.8936 ± 0.0530), its precision and recall remain relatively low (0.3824 and 0.2708, respectively), reflecting the challenge of detecting minority class instances. The Random Forest model shows a better balance between precision (0.5000), recall (0.3542), and F1-score (0.4146), suggesting that it may be more effective in identifying Tornado Cash-related activity despite the inflated accuracy figure.
+
+\begin{table}[h]
+\centering
+\caption{Performance Analysis of ML Models for Anomaly Detection}
+\label{tab:model_performance}
+\begin{tabular}{lcccccc}
+\toprule\textbf{Algorithm} & \textbf{AUC} & \textbf{CV AUC (±SD)} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{Accuracy} \\
+\midrule
+XGBoost & \textbf{0.8756} & \textbf{0.8936 (±0.0530)} & 0.3824 & 0.2708 & 0.3171 & 1.00 \\
+Random Forest & 0.8293 & 0.8094 (±0.0985) & \textbf{0.5000} & \textbf{0.3542} & \textbf{0.4146} & 1.00 \\
+Gradient Boosting & 0.8161 & 0.7813 (±0.2862) & 0.1915 & 0.1875 & 0.1895 & 1.00 \\
+Logistic Regression & 0.7014 & 0.7188 (±0.1339) & 0.0000 & 0.0000 & 0.0000 & 1.00 \\
+Support Vector Machine & 0.4145 & 0.5412 (±0.1335) & 0.0000 & 0.0000 & 0.0000 & 1.00 \\
+\bottomrule
+\end{tabular}
+
+\begin{minipage}{\textwidth}
+\par\vspace{0.5em}
+\footnotesize
+\textit{Note:} Bold values indicate best performance. CV AUC represents 5-fold cross-validation results with standard deviation. Threshold optimization was applied for Random Forest and XGBoost (0.100), while other models used default threshold (0.500).
+\end{minipage}
+\end{table}
+
+Delving into the results, XGBoost outperformed all other models with an AUC score of 0.8756 and demonstrated excellent cross-validation stability (CV AUC: 0.8936 ± 0.0530). However, Random Forest achieved a notably higher recall of 35.4\% while maintaining a precision of 50.0\%, making it particularly effective in detecting rare positive cases. Gradient Boosting showed moderate but unstable performance, whereas Logistic Regression and Support Vector Machine failed entirely to identify any suspicious transactions, highlighting their inability to cope with the extreme class imbalance in the dataset.
+
+The AUC is a widely used metric that evaluates a classifier's ability to distinguish between classes by plotting the True Positive Rate (TPR) against the False Positive Rate (FPR) across varying thresholds. While a high AUC indicates strong overall ranking performance, it does not reflect how the model performs at a specific decision threshold, especially in imbalanced datasets (as in our case). In practice, models are deployed at fixed thresholds, where metrics such as recall, precision, and the confusion matrix provide a more realistic view of classification effectiveness especially in imbalanced scenarios where false negatives or false positives can carry significant consequences. Therefore, relying solely on AUC can be misleading, and a thorough performance evaluation must include threshold-dependent metrics to assess real-world applicability. To gain a deeper understanding of the models' operational performance, especially in identifying minority class instances, it is necessary to examine their confusion matrices. Confusion matrices provide a granular view of true positives, false positives, true negatives, and false negatives, enabling a more practical assessment of a model’s strengths and weaknesses. The following section presents and analyzes these confusion matrices to better evaluate model suitability for anomaly detection scenarios.
+
+
+\subsection{Comparative Confusion Matrix Analysis}
+
+The confusion matrix analysis reveals the trade-off between precision and recall across different algorithms and datasets. Tables~\ref{tab:cctp_confusion} and~\ref{tab:across_confusion} present detailed confusion matrix results for both experimental datasets.
+
+\begin{table}[H]
+\centering
+\caption{CCTP Bridge: Confusion Matrix Analysis and Detection Performance}
+\label{tab:cctp_confusion}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Model} & \textbf{TP} & \textbf{FP} & \textbf{TN} & \textbf{FN} & \textbf{Detection Rate (\%)} & \textbf{False Alarm Rate (\%)} \\
+\midrule
+Random Forest & 17 & 17 & 118,323 & 31 & 35.4 & 0.014 \\
+XGBoost & 13 & 21 & 118,319 & 35 & 27.1 & 0.018 \\
+Gradient Boosting & 9 & 38 & 118,302 & 39 & 18.8 & 0.032 \\
+Logistic Regression & 0 & 0 & 118,340 & 48 & 0.0 & 0.0 \\
+Support Vector Machine & 0 & 0 & 118,340 & 48 & 0.0 & 0.0 \\
+\bottomrule
+\end{tabular}
+
+\begin{minipage}{\textwidth}
+\par\vspace{0.5em}
+\footnotesize
+\textit{Note:} Test set contained 48 Tornado Cash-associated transactions out of 118,388 total transactions.
+\end{minipage}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Across Protocol: Confusion Matrix Analysis and Detection Performance}
+\label{tab:across_confusion}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Model} & \textbf{TP} & \textbf{FP} & \textbf{TN} & \textbf{FN} & \textbf{Detection Rate (\%)} & \textbf{False Alarm Rate (\%)} \\
+\midrule
+Random Forest & 27 & 32 & 224,523 & 52 & 34.2 & 0.014 \\
+XGBoost & 19 & 55 & 224,500 & 60 & 24.1 & 0.024 \\
+Gradient Boosting & 4 & 16 & 224,539 & 75 & 5.1 & 0.007 \\
+Logistic Regression & 0 & 0 & 224,555 & 79 & 0.0 & 0.0 \\
+Support Vector Machine & 0 & 0 & 224,555 & 79 & 0.0 & 0.0 \\
+\bottomrule
+\end{tabular}
+
+\begin{minipage}{\textwidth}
+\par\vspace{0.5em}
+\footnotesize
+\textit{Note:} TP = True Positives, FP = False Positives, TN = True Negatives, FN = False Negatives. Detection Rate = TP/(TP+FN) × 100\%, False Alarm Rate = FP/(FP+TN) × 100\%. Test set contained 79 Tornado Cash-associated transactions out of 224,634 total transactions.
+\end{minipage}
+\end{table}
+
+\subsubsection{Cross-Dataset Confusion Matrix Insights}
+
+The confusion matrix comparison reveals important patterns:
+
+\textbf{Consistent Detection Rates:} Random Forest maintained remarkably consistent detection rates across datasets (35.4\% vs. 34.2\%), demonstrating robustness to dataset variations. This consistency is particularly valuable for operational deployment where stable performance is crucial.
+
+\textbf{Scalability Challenges:} While XGBoost achieved higher AUC scores, its detection rates decreased on the larger Across dataset (27.1\% vs. 24.1\%), suggesting potential challenges in scaling to larger, more complex transaction volumes.
+
+\textbf{False Alarm Consistency:} Both Random Forest and XGBoost maintained low false alarm rates (≤0.024\%) across datasets, indicating good precision control even when optimizing for recall.
+
+\textbf{Feature Complexity Impact:} Gradient Boosting showed significant performance degradation on the Across dataset (18.8\% vs. 5.1\% detection rate), highlighting sensitivity to increased feature dimensionality and complexity.
+
+\subsection{Feature Importance Analysis Across Datasets}
+
+The feature importance analysis reveals interesting patterns in how different bridge architectures contribute to anomaly detection. Table~\ref{tab:feature_importance} compares the top 5 most important features identified by Random Forest across both datasets.
+
+\begin{table}[H]
+\centering
+\caption{Comparative Feature Importance Analysis}
+\label{tab:feature_importance}
+\begin{tabular}{clcclc}
+\toprule
+\multicolumn{3}{c}{\textbf{CCTP Bridge}} & \multicolumn{3}{c}{\textbf{Across Protocol}} \\
+\cmidrule(lr){1-3} \cmidrule(lr){4-6}
+\textbf{Rank} & \textbf{Feature} & \textbf{Importance} & \textbf{Rank} & \textbf{Feature} & \textbf{Importance} \\
+\midrule
+1 & src\_from\_address & 0.2798 & 1 & src\_from\_address & 0.1568 \\
+2 & dst\_timestamp & 0.1847 & 2 & src\_timestamp & 0.1312 \\
+3 & src\_timestamp & 0.1836 & 3 & dst\_timestamp & 0.1274 \\
+4 & amount & 0.1678 & 4 & quote\_timestamp & 0.1164 \\
+5 & amount\_usd & 0.1618 & 5 & output\_amount\_usd & 0.0995 \\
+\bottomrule
+\end{tabular}
+
+\begin{minipage}{\textwidth}
+\par\vspace{0.5em}
+\footnotesize
+\textit{Note:} Importance values represent Random Forest feature importance scores. Higher values indicate greater contribution to anomaly detection.
+\end{minipage}
+\end{table}
+
+\subsubsection{Cross-Dataset Feature Insights}
+
+\textbf{Address Patterns:} The source address (\texttt{src\_from\_address}) consistently ranks as the most important feature across both datasets, though with varying importance scores (0.2798 vs. 0.1568). This suggests that address-based behavioral patterns are fundamental to identifying suspicious cross-chain activities, regardless of the specific bridge protocol.
+
+\textbf{Temporal Features:} Timestamp-related features (source, destination, and quote timestamps) consistently appear in the top rankings across both datasets. This indicates that temporal patterns in cross-chain transactions are crucial for anomaly detection, possibly capturing unusual timing behaviors associated with mixing activities.
+
+\textbf{Bridge-Specific Features:} The Across Protocol dataset introduces unique features such as \texttt{quote\_timestamp}, which ranks fourth in importance, highlighting how bridge-specific architectural elements can provide additional discriminative power for anomaly detection.
+
+\textbf{Amount Features:} Transaction amounts remain important but show different patterns across datasets. CCTP emphasizes both raw amounts and USD values, while Across focuses more on output amounts, reflecting different bridge economic models.
+
+\subsection{Cross-Dataset Model Robustness and Limitations}
+
+The comparative analysis across CCTP and Across Protocol datasets reveals both strengths and limitations of the proposed anomaly detection framework:
+
+\subsubsection{Robustness Indicators}
+
+\textbf{Consistent Algorithm Rankings:} Random Forest and XGBoost consistently outperformed other algorithms across both datasets, indicating reliable algorithmic selection. Random Forest maintained the best recall-precision balance in both experiments, suggesting robust performance characteristics.
+
+\textbf{Threshold Stability:} Both top-performing models converged to the same optimal threshold (0.100) across datasets, indicating consistent decision boundary requirements for extreme imbalance scenarios.
+
+\textbf{Feature Pattern Consistency:} Address and temporal features consistently ranked highly across datasets, suggesting universal importance of these patterns for cross-chain anomaly detection.
+
+\subsubsection{Limitations and Challenges}
+
+Despite promising results, several limitations persist across both datasets:
+
+\textbf{Conservative Detection Rates:} Neither dataset achieved the target 85\% recall, with maximum detection rates around 35\%. This conservative behavior limits effectiveness in comprehensive compliance applications where missing suspicious transactions carries high costs.
+
+\textbf{Scale Sensitivity:} Performance variations between datasets (particularly for Gradient Boosting) suggest potential challenges in scaling to different bridge architectures and transaction volumes.
+
+\textbf{Class Imbalance Persistence:} Both datasets exhibited similar extreme imbalance ratios (≈0.04\% positive class), and the models' inability to achieve higher recall rates suggests fundamental limitations in handling such extreme scenarios with traditional supervised learning approaches.
+
+\subsection{Enhanced Model Limitations and Future Research Directions}
+
+The cross-dataset analysis reveals that while the framework demonstrates consistency, several enhancement opportunities exist:
+
+\textbf{Advanced Sampling Techniques:} Implementation of sophisticated resampling methods like SMOTE-variants, ADASYN, or cost-sensitive learning could potentially improve minority class detection without excessive false positive generation.
+
+\textbf{Ensemble Approaches:} Combining models optimized for different objectives (high precision vs. high recall) could provide more flexible deployment options for different risk tolerance levels.
+
+\textbf{Bridge-Specific Feature Engineering:} The different feature importance patterns across datasets suggest opportunities for bridge-specific feature engineering that could capture protocol-specific suspicious behavior patterns.
+
+\textbf{Temporal and Network Analysis:} Integration of temporal sequence analysis and network-based features could capture sophisticated laundering patterns that transcend individual transaction characteristics.
+
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}{0.48\textwidth}
+  \includegraphics[width=1\linewidth]{random_forest_confusion_matrix.png}
+%    \caption{Enter Caption}
+    \label{fig:placeholder}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.48\textwidth}
+    \includegraphics[width=1\linewidth]{xgboost_confusion_matrix.png}
+ %   \caption{Enter Caption}
+    \label{fig:placeholder}
+  \end{subfigure}
+  \caption{Confusion Matrix Results}
+  \label{fig:side_by_side}
+\end{figure}
+
+
+As shown in Figure~\ref{fig:side_by_side}, the confusion matrix results clearly illustrate the inherent precision recall trade-off associated with learning from a highly imbalanced dataset. Random Forest achieved the optimal balance with 35.4\% recall and 50\% precision, successfully detecting 17 out of 48 actual Tornado Cash transactions while generating only 17 false positives. XGBoost, despite having the highest AUC, demonstrated lower recall (27.1\%) with 38.2\% precision, detecting only 13 suspicious transactions but with fewer false positives. This comparison highlights that AUC alone is insufficient for evaluating performance in security-critical applications where recall is paramount.
+
+While AUC values suggest that XGBoost is the best-performing model with an AUC of 0.8756 compared to Random Forest’s 0.8293 the confusion matrix analysis presents a more nuanced view. Random Forest, despite having a lower AUC, achieved a higher recall of 35.4\% (detecting 17 out of 48 true positives) and a precision of 50.0\%. In contrast, XGBoost, though ranking positive instances better overall, only achieved 27.1\% recall and 38.2\% precision. This discrepancy highlights a critical limitation of relying solely on AUC, particularly in highly imbalanced datasets. AUC evaluates model performance across all thresholds, but practical deployment typically uses a single decision threshold. At that fixed threshold, the confusion matrix provides clearer insights into real-world effectiveness especially when minimizing false negatives or maximizing recall is a priority. Therefore, while AUC remains a valuable metric for overall model comparison, confusion matrix-derived metrics like recall and precision are indispensable for threshold-level evaluation and operational decision-making.
+
+
+\subsection{Threshold Optimization}
+
+Following initial testing, threshold optimization was applied only to Random Forest and XGBoost, which showed stronger performance on the highly imbalanced dataset. The other models Logistic Regression, Support Vector Machine (SVM), and Gradient Boosting were evaluated using the default threshold of 0.500.
+
+An \texttt{optimize\_threshold\_for\_recall} function was implemented to search for an optimal decision threshold that improves recall without excessively compromising precision. The function tested 80 threshold values ranging from 0.10 to 0.89 (in 0.01 increments). The optimization objective was to achieve a recall of at least 85\% (i.e., detecting 85\% of all suspicious transactions) while maintaining a minimum precision of 10\% to avoid an excessive number of false positives. If no threshold met this dual criteria, the function selected the threshold yielding the highest possible recall.
+
+
+For the Random Forest model, the optimal threshold was identified as 0.1. This aggressive threshold reflects the extreme difficulty of detecting minority-class instances in the dataset, which exhibits a severe imbalance ratio of 2,455:1. At this threshold, Random Forest achieved a detection rate (recall) of 35.4\%. Although the target recall of 85\% could not be reached, the 0.1 threshold yielded the highest achievable recall while maintaining a precision of 50.0\%, avoiding an unacceptable increase in false positives.
+
+XGBoost also underwent threshold optimization and selected the same threshold of 0.100. However, it achieved a slightly lower detection rate of 27.1\%, despite attaining a higher AUC score of 0.8756, compared to Random Forest’s 0.8293. This indicates that while XGBoost demonstrated superior overall discriminative capability, it was more conservative in identifying positive cases under the optimized threshold.
+
+In contrast, models that used the default threshold of 0.500 performed poorly in detecting the minority class:
+\begin{itemize}
+    \item Gradient Boosting: Recall = 18.8\%, Precision = 19.2\%
+    \item Logistic Regression: Recall = 0.0\% (complete failure to detect any positive cases)
+    \item Support Vector Machine (SVM): Recall = 0.0\% (complete failure)
+\end{itemize}
+
+These results highlight the importance of threshold tuning in imbalanced classification tasks, especially when recall is critical and false negatives carry a high cost.
+
+
+\subsection{Model Limitations and Enhancement Opportunities}
+
+
+Despite promising results, the current models exhibit conservative prediction behavior, which limits their effectiveness in real-world compliance applications. In the context of cross-chain bridge anomaly detection, the primary goal is to identify all abnormal transactions, particularly those linked to laundering activities via tools like Tornado Cash. This requires maximizing recall to ensure that no suspicious transaction goes undetected even at the cost of tolerating some false positives. However, the models struggle to achieve high recall due to: (i) extreme class imbalance (2,455:1), which biases learning towards the majority class; and (ii) threshold sensitivity; abnormal cross-chain transactions such as those associated with illicit activity are particularly difficult to detect when routed through cross-chain bridges, as they often do not exhibit statistically significant deviations from legitimate behavior.
+
+These limitations suggest that while the system can reliably flag high-confidence cases (e.g., Random Forest’s perfect precision), it cannot yet serve as a comprehensive detection solution for corss-chain bridges. To improve detection, cost-sensitive learning can boost recall by penalizing missed cases, while ensemble methods help balance precision and recall. Resampling techniques like SMOTE address class imbalance, and network-based or temporal features capture laundering patterns across transactions. These enhancements support the shift toward a robust anomaly detection system fit for compliance-sensitive environments.
+
+
+
+\begin{comment}
+
+\section{Results and Discussion - old}
+
+%Dataset and Methodology:  Our supervised learning approach was applied to a comprehensive dataset of 591,940 CCTP bridge transactions, comprising 12 features including source and destination blockchain networks, transaction hashes, timestamps, depositor and recipient addresses, transaction amounts, and USD valuations. The dataset exhibited significant class imbalance with only 241 transactions (0.04\%) showing Tornado Cash connections, representing the realistic distribution of suspicious activities in cross-chain bridge operations. Feature engineering reduced the dimensionality to 7 key predictive variables: source blockchain, source address, source timestamp, destination blockchain, destination timestamp, transaction amount, and USD amount, after excluding unique identifiers and textual address fields. The dataset was partitioned using stratified sampling with an 80-20 train-test split, maintaining class distribution across subsets (training: 473,552 samples with 193 positive cases; testing: 118,388 samples with 48 positive cases).
+
+
+\subsection{Business and Regulatory Implications}
+
+The applicability of this system lies in its ability to flag transactions exhibiting anomalous patterns, specifically those associated with Tornado Cash mixing activity. This capability can be leveraged across multiple domains, including a Risk Assessment Framework, Operational Deployment Strategy, and Regulatory Compliance Considerations. By identifying high-risk transactions with precision, the system offers a valuable tool for financial institutions and regulatory bodies aiming to enhance AML efforts and ensure compliance with evolving standards.
+
+\paragraph{Risk Assessment Framework:} The Random Forest model's perfect precision establishes a reliable framework for high-confidence suspicious transaction identification. When the model flags a transaction as Tornado Cash-associated, compliance teams can initiate investigations with complete confidence in the prediction's accuracy. However, the 79.2\% false negative rate indicates that the model should serve as a first-line screening tool rather than a comprehensive detection system.
+
+\paragraph{Operational Deployment Strategy:} The results suggest a two-tier compliance approach: (1) immediate investigation of Random Forest-flagged transactions (zero false positive rate ensures efficient resource allocation), and (2) additional screening mechanisms for the remaining transactions to address the high false negative rate. The conservative nature of the model makes it suitable for automated flagging systems where false positives carry high operational costs.
+
+\paragraph{Regulatory Compliance Considerations:} While the model demonstrates strong discriminative capability (AUC $>$ 0.8), the 79.2\% false negative rate may not meet stringent regulatory requirements for comprehensive suspicious activity detection. The model's performance suggests that sophisticated money laundering patterns in cross-chain transactions remain challenging to detect using traditional transaction features alone, potentially requiring advanced feature engineering, network analysis, or ensemble methods combining multiple detection approaches.
+
+\subsection{Model Limitations and Future Enhancements:} The conservative prediction threshold optimized for precision comes at the cost of recall, suggesting opportunities for threshold optimization based on specific business requirements. Alternative approaches such as cost-sensitive learning, ensemble methods with different decision thresholds, or advanced resampling techniques could potentially improve the precision-recall balance while maintaining the model's reliability for compliance applications.
+
+\end{comment}
+
+\section{Discussion and Comparison with Related Work}
+
+Cross-chain bridges have become a critical component of the blockchain ecosystem, enabling interoperability and liquidity across disparate networks. However, their complexity also makes them prime targets for exploits and use it for illiterate activities. Recent research has focused on detecting security vulnerabilities within cross-chain bridges using ML and graph-based techniques. For example, \textit{XChainWatcher} \cite{xchainwatcher2024} uses Datalog logic models to track cross-chain event flows and identify mismatches or anomalies, successfully detecting major incidents such as the Ronin and Nomad bridge hacks. \textit{BridgeGuard} \cite{bridgeguard2024} introduces a two-stage graph mining method to extract attack patterns from execution traces, outperforming prior tools in identifying bridge-specific vulnerabilities. Within the cross-chain domain related to anomaly detection Lin et al. present two complementary approaches that represent the current state-of-the-art in this domain. In their graph-based approach, Lin et al. introduce GMMCCT~\cite{lin2024cross}, a multi-model fusion framework that leverages the inherent graph structure of cross-chain interactions. The authors model accounts as nodes and transactions as edges, applying Node2Vec for graph embedding and fusing predictions from Logistic Regression, XGBoost, and Graph Convolutional Networks (GCN). Using a dataset of 234,233 transactions and 4,577 nodes from the Multichain bridge, with 1,077 abnormal and 3,500 normal nodes, GMMCCT achieved 57\% precision and 43\% recall for abnormal nodes. However, graph-based models require rich contextual information beyond simple sender-recipient relationships. Bridge transactions typically contain limited information such as sender address, recipient address, amount, and timestamp, which constrains the model's ability to construct meaningful graph structures for effective anomaly detection.
+
+In their subsequent work, Lin et al. propose CrossAAD~\cite{jiang2025cross}, a ML-based framework for detecting abnormal accounts across blockchain networks. This approach utilizes engineered features and supervised learning on a labeled dataset of 8,322 accounts, comprising 6,000 normal (72\%) and 2,322 abnormal (28\%) accounts, with labels derived from publicly available sources such as Etherscan and known exploit addresses. To the best of our knowledge, the dataset and source code associated with the published study have not been made publicly available. The authors evaluated four baseline models (Random Forest, Logistic Regression, Support Vector Machine, and XGBoost), with XGBoost demonstrating superior performance.
+
+Compare to our study the CrossAAD study operates under relatively favorable conditions with a moderate imbalance dataset ratio of 2.6:1 (normal to abnormal accounts). In contrast, real-world cross-chain compliance scenarios often present much more challenging conditions. Our study addresses an extreme imbalance scenario with a 2,455:1 ratio (0.04\% positive class), representing conditions more typical of actual financial compliance environments where suspicious activities constitute a tiny fraction of total transactions.
+
+This difference in dataset characteristics has profound implications for model performance and deployment strategies. While CrossAAD's reported metrics appear favorable, they may not generalize to the extreme imbalance conditions encountered in practice. Our results demonstrate that under such conditions, achieving 35.4\% recall with 50\% precision represents significant performance, highlighting the need for specialized approaches to handle extreme class imbalance in cross-chain anomaly detection.
+
+The primary goal of this study is to explore the potential for developing a framework for anomaly detection tailored to security critical and compliance sensitive environments, such as cross-chain bridges. In such settings, missing suspicious transactions presents a significantly greater risk than incorrectly flagging legitimate ones. The key insight from this study highlights that, for security focused applications, systems should be designed to tolerate moderate false positive rates in order to achieve high recall and ensure comprehensive detection of potential threats.
+
+
+\section{Conclusion}
+
+This study presents a comprehensive and practical anomaly detection framework for cross-chain bridge transactions, validated across two distinct bridge protocols: Circle's CCTP and Across Protocol. By focusing on addresses that interact with both Tornado Cash and bridge services, the framework isolates high-risk entities and applies feature-based machine learning models to detect abnormal behavior under extreme class imbalance conditions.
+
+The comparative analysis across 591,940 CCTP transactions and 1,123,166 Across Protocol transactions demonstrates several key findings:
+
+\textbf{Algorithmic Consistency:} Random Forest consistently achieved the best recall-precision balance across both datasets (35.42\% vs. 34.18\% recall), demonstrating robust performance characteristics that generalize across different bridge architectures and feature spaces.
+
+\textbf{Feature Universality:} Source address patterns and temporal features consistently ranked as most important across datasets, indicating universal behavioral signatures for cross-chain anomaly detection regardless of specific bridge protocol implementation.
+
+\textbf{Scalability Validation:} The framework successfully processed datasets ranging from hundreds of thousands to over one million transactions, with consistent algorithmic rankings and performance patterns, supporting operational scalability.
+
+\textbf{Threshold Robustness:} Both top-performing models converged to identical optimal thresholds (0.100) across datasets, indicating stable decision boundary requirements for extreme imbalance scenarios.
+
+While the recall rates (≈35\%) are lower than those reported in prior work such as CrossAAD, our models are evaluated under significantly more realistic and challenging conditions with extreme class imbalance ratios (>2,400:1) compared to the moderate imbalance (2.6:1) in previous studies. This represents conditions more typical of actual financial compliance environments where suspicious activities constitute a tiny fraction of total transactions.
+
+The multi-dataset validation approach provides confidence in the framework's generalizability and practical applicability across diverse cross-chain environments. The use of Random Forest and XGBoost models, combined with threshold optimization, enables scalable and interpretable detection suitable for compliance-sensitive applications.
+
+Future research directions include integration of advanced sampling techniques for improved minority class detection, ensemble methods for flexible risk tolerance deployment, and incorporation of temporal sequence analysis to capture sophisticated multi-transaction laundering patterns. The framework's modular design supports these enhancements while maintaining the interpretability and reliability essential for regulatory compliance applications.
+
+Overall, this work contributes a robust, validated, and adaptable solution for blockchain anomaly detection, demonstrated across multiple bridge protocols and ready for integration into compliance monitoring systems with clear pathways for performance enhancement through hybrid modeling approaches.

@@ -1,4 +1,3 @@
-
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -197,7 +196,7 @@ class BridgeComplianceML:
             'Gradient Boosting': GradientBoostingClassifier(random_state=42),
             'XGBoost': xgb.XGBClassifier(random_state=42, eval_metric='logloss'),
             'Logistic Regression': LogisticRegression(random_state=42, max_iter=1000),
-            'SVM': SVC(probability=True, random_state=42)
+            'SVM': SVC(probability=True, random_state=42, kernel='linear', C=0.1, max_iter=1000)
         }
         
         # Train and evaluate each model
@@ -508,7 +507,8 @@ def main():
     Main function to run the analysis
     """
     # Initialize the ML analysis
-    ml_analysis = BridgeComplianceML('cctp_bridge_data_labeled_enhanced.csv')
+  #  ml_analysis = BridgeComplianceML('cctp_bridge_data_labeled.csv')
+    ml_analysis = BridgeComplianceML('across_bridge_data_labeled.csv')
     
     # Run complete analysis
     ml_analysis.run_complete_analysis()

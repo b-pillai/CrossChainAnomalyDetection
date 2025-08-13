@@ -1,0 +1,239 @@
+Starting complete Bridge Compliance ML Analysis...
+Loading and exploring the dataset...
+Dataset shape: (591940, 62)
+
+Columns: ['src_blockchain', 'src_transaction_hash', 'src_from_address', 'src_timestamp', 'dst_blockchain', 'dst_transaction_hash', 'dst_timestamp', 'depositor', 'recipient', 'amount', 'amount_usd', 'tornado_cash_label', 'amount_usd_percentile', 'amount_category', 'is_very_low_amount', 'is_low_amount', 'is_high_amount', 'is_very_high_amount', 'is_round_amount', 'is_round_usd', 'depositor_avg_amount', 'depositor_std_amount', 'depositor_tx_count', 'amount_zscore', 'addr_tx_count', 'addr_total_volume', 'addr_avg_amount', 'addr_median_amount', 'addr_std_amount', 'addr_min_amount', 'addr_max_amount', 'addr_unique_src_chains', 'addr_unique_dst_chains', 'addr_unique_recipients', 'addr_small_tx_count', 'addr_small_tx_ratio', 'addr_amount_range', 'addr_coefficient_variation', 'addr_potential_structuring', 'addr_high_frequency_small', 'addr_is_cross_chain_frequent', 'addr_is_multi_recipient', 'src_timestamp_dt', 'dst_timestamp_dt', 'src_hour', 'src_day_of_week', 'src_is_weekend', 'src_is_night', 'bridge_time_diff', 'bridge_time_hours', 'activity_span_days', 'unique_hours', 'unique_days', 'activity_concentration', 'daily_frequency', 'structuring_risk_score', 'velocity_risk_score', 'diversity_risk_score', 'temporal_risk_score', 'combined_risk_score', 'normalized_risk_score', 'risk_category']
+
+First few rows:
+  src_blockchain                               src_transaction_hash  ... normalized_risk_score  risk_category
+0      avalanche  0x7f3964b10884217cc9838928a5b7708b92cbbc2a6757...  ...              7.391304      very_high
+1       optimism  0x0dc189a9522239610d0c20786ab843f052fbef441b27...  ...              7.391304      very_high
+2       arbitrum  0xf3d7c7e5d9e5679610990d411e34737cb2eb70320fa8...  ...              8.695652      very_high
+3        polygon  0xd2e0301028bb669202577335c9a7d10131d96ccb9fb9...  ...              7.391304      very_high
+4           base  0x8eaad52783b60af14d9b23b0fb9f56c506d1af7177c1...  ...              7.391304      very_high
+
+[5 rows x 62 columns]
+
+Label distribution:
+tornado_cash_label
+0    591699
+1       241
+Name: count, dtype: int64
+Percentage of Tornado Cash matches: 0.04%
+
+Missing values:
+src_blockchain           0
+src_transaction_hash     0
+src_from_address         0
+src_timestamp            0
+dst_blockchain           0
+                        ..
+diversity_risk_score     0
+temporal_risk_score      0
+combined_risk_score      0
+normalized_risk_score    0
+risk_category            0
+Length: 62, dtype: int64
+
+Data types:
+src_blockchain            object
+src_transaction_hash      object
+src_from_address          object
+src_timestamp              int64
+dst_blockchain            object
+                          ...
+diversity_risk_score       int64
+temporal_risk_score        int64
+combined_risk_score        int64
+normalized_risk_score    float64
+risk_category             object
+Length: 62, dtype: object
+
+Preprocessing data...
+Features selected: ['src_blockchain', 'src_from_address', 'src_timestamp', 'dst_blockchain', 'dst_timestamp', 'amount', 'amount_usd', 'amount_usd_percentile', 'amount_category', 'is_very_low_amount', 'is_low_amount', 'is_high_amount', 'is_very_high_amount', 'is_round_amount', 'is_round_usd', 'depositor_avg_amount', 'depositor_std_amount', 'depositor_tx_count', 'amount_zscore', 'addr_tx_count', 'addr_total_volume', 'addr_avg_amount', 'addr_median_amount', 'addr_std_amount', 'addr_min_amount', 'addr_max_amount', 'addr_unique_src_chains', 'addr_unique_dst_chains', 'addr_unique_recipients', 'addr_small_tx_count', 'addr_small_tx_ratio', 'addr_amount_range', 'addr_coefficient_variation', 'addr_potential_structuring', 'addr_high_frequency_small', 'addr_is_cross_chain_frequent', 'addr_is_multi_recipient', 'src_timestamp_dt', 'dst_timestamp_dt', 'src_hour', 'src_day_of_week', 'src_is_weekend', 'src_is_night', 'bridge_time_diff', 'bridge_time_hours', 'activity_span_days', 'unique_hours', 'unique_days', 'activity_concentration', 'daily_frequency', 'structuring_risk_score', 'velocity_risk_score', 'diversity_risk_score', 'temporal_risk_score', 'combined_risk_score', 'normalized_risk_score', 'risk_category']
+Feature matrix shape: (591940, 57)
+
+Splitting data (test_size=0.2)...
+Training set shape: (473552, 57)
+Test set shape: (118388, 57)
+Training set label distribution:
+tornado_cash_label
+0    473359
+1       193
+Name: count, dtype: int64
+
+Training multiple machine learning models...
+
+Training Random Forest...
+Random Forest - Optimal threshold: 0.100, Recall: 0.292
+Random Forest - AUC: 0.8066, Recall: 0.2917, Precision: 0.2121, F1: 0.2456
+        Threshold: 0.100
+
+Training Gradient Boosting...
+Gradient Boosting - AUC: 0.9544, Recall: 0.2917, Precision: 0.4118, F1: 0.3415
+        Threshold: 0.500
+
+Training XGBoost...
+XGBoost - Optimal threshold: 0.100, Recall: 0.250
+XGBoost - AUC: 0.9295, Recall: 0.2500, Precision: 0.5714, F1: 0.3478
+        Threshold: 0.100
+
+Training Logistic Regression...
+Logistic Regression - AUC: 0.9238, Recall: 0.0000, Precision: 0.0000, F1: 0.0000
+        Threshold: 0.500
+
+Training SVM...
+SVM - AUC: 0.7727, Recall: 0.0000, Precision: 0.0000, F1: 0.0000
+        Threshold: 0.500
+
+Model Evaluation Summary:
+================================================================================
+
+Random Forest:
+  Threshold: 0.100
+  AUC Score: 0.8066
+  Recall: 0.2917
+  Precision: 0.2121
+  F1 Score: 0.2456
+  CV AUC: 0.8061 (+/- 0.0443)
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00    118340
+           1       0.21      0.29      0.25        48
+
+    accuracy                           1.00    118388
+   macro avg       0.61      0.65      0.62    118388
+weighted avg       1.00      1.00      1.00    118388
+
+Confusion Matrix:
+[[118288     52]
+ [    34     14]]
+
+Gradient Boosting:
+  Threshold: 0.500
+  AUC Score: 0.9544
+  Recall: 0.2917
+  Precision: 0.4118
+  F1 Score: 0.3415
+  CV AUC: 0.9089 (+/- 0.0535)
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00    118340
+           1       0.41      0.29      0.34        48
+
+    accuracy                           1.00    118388
+   macro avg       0.71      0.65      0.67    118388
+weighted avg       1.00      1.00      1.00    118388
+
+Confusion Matrix:
+[[118320     20]
+ [    34     14]]
+
+XGBoost:
+  Threshold: 0.100
+  AUC Score: 0.9295
+  Recall: 0.2500
+  Precision: 0.5714
+  F1 Score: 0.3478
+  CV AUC: 0.9321 (+/- 0.0291)
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00    118340
+           1       0.57      0.25      0.35        48
+
+    accuracy                           1.00    118388
+   macro avg       0.79      0.62      0.67    118388
+weighted avg       1.00      1.00      1.00    118388
+
+Confusion Matrix:
+[[118331      9]
+ [    36     12]]
+
+Logistic Regression:
+  Threshold: 0.500
+  AUC Score: 0.9238
+  Recall: 0.0000
+  Precision: 0.0000
+  F1 Score: 0.0000
+  CV AUC: 0.8969 (+/- 0.0342)
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00    118340
+           1       0.00      0.00      0.00        48
+
+    accuracy                           1.00    118388
+   macro avg       0.50      0.50      0.50    118388
+weighted avg       1.00      1.00      1.00    118388
+
+Confusion Matrix:
+[[118340      0]
+ [    48      0]]
+
+SVM:
+  Threshold: 0.500
+  AUC Score: 0.7727
+  Recall: 0.0000
+  Precision: 0.0000
+  F1 Score: 0.0000
+  CV AUC: 0.7419 (+/- 0.1410)
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00    118340
+           1       0.00      0.00      0.00        48
+
+    accuracy                           1.00    118388
+   macro avg       0.50      0.50      0.50    118388
+weighted avg       1.00      1.00      1.00    118388
+
+Confusion Matrix:
+[[118340      0]
+ [    48      0]]
+
+Creating visualizations...
+
+============================================================
+BRIDGE COMPLIANCE ANALYSIS - TORNADO CASH DETECTION
+============================================================
+
+Dataset: cctp_bridge_data_labeled_enhanced.csv
+Total transactions: 591940
+Tornado Cash matches: 241
+Match rate: 0.04%
+
+Best performing model (by recall):
+Model: Random Forest
+Recall: 0.2917
+Precision: 0.2121
+F1 Score: 0.2456
+AUC Score: 0.8066
+Threshold: 0.100
+
+Top 5 Most Important Features:
+1. src_from_address: 0.0946
+2. src_timestamp: 0.0776
+3. src_timestamp_dt: 0.0765
+4. dst_timestamp: 0.0746
+5. dst_timestamp_dt: 0.0739
+
+Analysis complete!
+
+Would you like to perform hyperparameter tuning? (This may take some time)
+
+Performing hyperparameter tuning for Random Forest...
+Fitting 5 folds for each of 81 candidates, totalling 405 fits
+Best parameters: {'max_depth': 10, 'min_samples_leaf': 2, 'min_samples_split': 2, 'n_estimators': 100}
+Best CV score: 0.9432
+Random Forest - Optimal threshold: 0.100, Recall: 0.229
+Test AUC with best model: 0.9386
+Test Recall: 0.2292, Precision: 0.4400
+PS C:\Users\BabuPillai\OneDrive - Griffith University\Documents\GitHub\CrossChainAnomalyDetection> 

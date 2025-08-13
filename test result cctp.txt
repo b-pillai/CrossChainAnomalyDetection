@@ -1,0 +1,241 @@
+Starting complete Bridge Compliance ML Analysis...
+Loading and exploring the dataset...
+Dataset shape: (591940, 12)
+
+Columns: ['src_blockchain', 'src_transaction_hash', 'src_from_address', 'src_timestamp', 'dst_blockchain', 'dst_transaction_hash', 'dst_timestamp', 'depositor', 'recipient', 'amount', 'amount_usd', 'tornado_cash_label']
+
+First few rows:
+  src_blockchain                               src_transaction_hash  ...  amount_usd  tornado_cash_label
+0       arbitrum  0xed3d9cbbe8cccb9e56bb02c15b2c9b55b022632c5b8d...  ...  204.951066                   0
+1       arbitrum  0x2942ed7183f6d347357d4e7ede45ba5771a35ee0f8aa...  ...  100.000000                   0
+2       arbitrum  0x67b8b5621f7a32e71afb5899c3ed41741d4b0e1f4312...  ...   20.000000                   0
+3       arbitrum  0x69f5b8adf3b0b6f768176cbcf2b8fd8503676b611827...  ...   37.582613                   0
+4       arbitrum  0xecbd0286881a579b255f43301137e5c8ce4681ec5c98...  ...  300.000000                   0
+
+[5 rows x 12 columns]
+
+Label distribution:
+tornado_cash_label
+0    591699
+1       241
+Name: count, dtype: int64
+Percentage of Tornado Cash matches: 0.04%
+
+Missing values:
+src_blockchain          0
+src_transaction_hash    0
+src_from_address        0
+src_timestamp           0
+dst_blockchain          0
+dst_transaction_hash    0
+dst_timestamp           0
+depositor               0
+recipient               0
+amount                  0
+amount_usd              0
+tornado_cash_label      0
+dtype: int64
+
+Data types:
+src_blockchain           object
+src_transaction_hash     object
+src_from_address         object
+src_timestamp             int64
+dst_blockchain           object
+dst_transaction_hash     object
+dst_timestamp             int64
+depositor                object
+recipient                object
+amount                    int64
+amount_usd              float64
+tornado_cash_label        int64
+dtype: object
+
+Preprocessing data...
+Features selected: ['src_blockchain', 'src_from_address', 'src_timestamp', 'dst_blockchain', 'dst_timestamp', 'amount', 'amount_usd']
+Feature matrix shape: (591940, 7)
+
+Splitting data (test_size=0.2)...
+Training set shape: (473552, 7)
+Test set shape: (118388, 7)
+Training set label distribution:
+tornado_cash_label
+0    473359
+1       193
+Name: count, dtype: int64
+
+Training multiple machine learning models...
+
+Training Random Forest...
+Random Forest - Optimal threshold: 0.100, Recall: 0.354
+Random Forest - AUC: 0.8293, Recall: 0.3542, Precision: 0.5000, F1: 0.4146
+        Threshold: 0.100
+
+Training Gradient Boosting...
+Gradient Boosting - AUC: 0.8161, Recall: 0.1875, Precision: 0.1915, F1: 0.1895
+        Threshold: 0.500
+
+Training XGBoost...
+XGBoost - Optimal threshold: 0.100, Recall: 0.271
+XGBoost - AUC: 0.8756, Recall: 0.2708, Precision: 0.3824, F1: 0.3171
+        Threshold: 0.100
+
+Training Logistic Regression...
+Logistic Regression - AUC: 0.7014, Recall: 0.0000, Precision: 0.0000, F1: 0.0000
+        Threshold: 0.500
+
+Training SVM...
+SVM - AUC: 0.4145, Recall: 0.0000, Precision: 0.0000, F1: 0.0000
+        Threshold: 0.500
+
+Model Evaluation Summary:
+================================================================================
+
+Random Forest:
+  Threshold: 0.100
+  AUC Score: 0.8293
+  Recall: 0.3542
+  Precision: 0.5000
+  F1 Score: 0.4146
+  CV AUC: 0.8094 (+/- 0.0985)
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00    118340
+           1       0.50      0.35      0.41        48
+
+    accuracy                           1.00    118388
+   macro avg       0.75      0.68      0.71    118388
+weighted avg       1.00      1.00      1.00    118388
+
+Confusion Matrix:
+[[118323     17]
+ [    31     17]]
+
+Gradient Boosting:
+  Threshold: 0.500
+  AUC Score: 0.8161
+  Recall: 0.1875
+  Precision: 0.1915
+  F1 Score: 0.1895
+  CV AUC: 0.7813 (+/- 0.2862)
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00    118340
+           1       0.19      0.19      0.19        48
+
+    accuracy                           1.00    118388
+   macro avg       0.60      0.59      0.59    118388
+weighted avg       1.00      1.00      1.00    118388
+
+Confusion Matrix:
+[[118302     38]
+ [    39      9]]
+
+XGBoost:
+  Threshold: 0.100
+  AUC Score: 0.8756
+  Recall: 0.2708
+  Precision: 0.3824
+  F1 Score: 0.3171
+  CV AUC: 0.8936 (+/- 0.0530)
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00    118340
+           1       0.38      0.27      0.32        48
+
+    accuracy                           1.00    118388
+   macro avg       0.69      0.64      0.66    118388
+weighted avg       1.00      1.00      1.00    118388
+
+Confusion Matrix:
+[[118319     21]
+ [    35     13]]
+
+Logistic Regression:
+  Threshold: 0.500
+  AUC Score: 0.7014
+  Recall: 0.0000
+  Precision: 0.0000
+  F1 Score: 0.0000
+  CV AUC: 0.7188 (+/- 0.1339)
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00    118340
+           1       0.00      0.00      0.00        48
+
+    accuracy                           1.00    118388
+   macro avg       0.50      0.50      0.50    118388
+weighted avg       1.00      1.00      1.00    118388
+
+Confusion Matrix:
+[[118340      0]
+ [    48      0]]
+
+SVM:
+  Threshold: 0.500
+  AUC Score: 0.4145
+  Recall: 0.0000
+  Precision: 0.0000
+  F1 Score: 0.0000
+  CV AUC: 0.5412 (+/- 0.1335)
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00    118340
+           1       0.00      0.00      0.00        48
+
+    accuracy                           1.00    118388
+   macro avg       0.50      0.50      0.50    118388
+weighted avg       1.00      1.00      1.00    118388
+
+Confusion Matrix:
+[[118340      0]
+ [    48      0]]
+
+Creating visualizations...
+
+============================================================
+BRIDGE COMPLIANCE ANALYSIS - TORNADO CASH DETECTION
+============================================================
+
+Dataset: cctp_bridge_data_labeled.csv
+Total transactions: 591940
+Tornado Cash matches: 241
+Match rate: 0.04%
+
+Best performing model (by recall):
+Model: Random Forest
+Recall: 0.3542
+Precision: 0.5000
+F1 Score: 0.4146
+AUC Score: 0.8293
+Threshold: 0.100
+
+Top 5 Most Important Features:
+1. src_from_address: 0.2798
+2. dst_timestamp: 0.1847
+3. src_timestamp: 0.1836
+4. amount: 0.1678
+5. amount_usd: 0.1618
+
+Analysis complete!
+
+Would you like to perform hyperparameter tuning? (This may take some time)
+
+Performing hyperparameter tuning for Random Forest...
+Fitting 5 folds for each of 81 candidates, totalling 405 fits
+Best parameters: {'max_depth': 10, 'min_samples_leaf': 1, 'min_samples_split': 10, 'n_estimators': 200}
+Best CV score: 0.9285
+Random Forest - Optimal threshold: 0.100, Recall: 0.208
+Test AUC with best model: 0.9065
+Test Recall: 0.2083, Precision: 0.9091
+PS C:\Users\BabuPillai\OneDrive - Griffith University\Documents\GitHub\CrossChainAnomalyDetection> 
